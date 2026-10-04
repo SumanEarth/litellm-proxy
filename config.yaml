@@ -1,0 +1,125 @@
+# LiteLLM config: one line per entry. To disable an entry, put "#" at the start of its line.
+# To enable: add the key to .env, remove the "#", restart the proxy.
+
+model_list:
+  # ==========================================================
+  # 1. VYCEAI, account 1 (ACTIVE: key = VYCEAI_API_KEY)
+  # ==========================================================
+  - { model_name: vyce-deepseek-flash, litellm_params: { model: "openai/deepseek-v4-flash", api_base: "https://vyceai.com/v1", api_key: "os.environ/VYCEAI_API_KEY" } }
+  - { model_name: "vyceai/*",          litellm_params: { model: "openai/*", api_base: "https://vyceai.com/v1", api_key: "os.environ/VYCEAI_API_KEY" } }
+
+  # ==========================================
+  # Baseten GLM Models
+  # ==========================================
+  - model_name: basteen-glm-5.3-flash
+    litellm_params:
+      model: "openai/zai-org/GLM-5.3-Flash"
+      api_base: "https://inference.baseten.co/v1"
+      api_key: os.environ/BASETEN_API_KEY
+
+  - model_name: basteen-glm-5.3
+    litellm_params:
+      model: "openai/zai-org/GLM-5.3"
+      api_base: "https://inference.baseten.co/v1"
+      api_key: os.environ/BASETEN_API_KEY
+
+  # Wildcard: allows calling baseten/<any-model-id>
+  - model_name: "baseten/*"
+    litellm_params:
+      model: "openai/*"
+      api_base: "https://inference.baseten.co/v1"
+      api_key: os.environ/BASETEN_API_KEY
+
+  #===================================================
+  # xKiro Specific Models
+  # ==========================================
+  - model_name: xkiro-gpt-4o
+    litellm_params:
+      model: "openai/gpt-4o"
+      api_base: "https://api.xkiro.com/v1"
+      api_key: os.environ/XKIRO_API_KEY_ENV
+
+  - model_name: xkiro-gpt-5.6
+    litellm_params:
+      model: "openai/gpt-5.6-sol"
+      api_base: "https://api.xkiro.com/v1"
+      api_key: os.environ/XKIRO_API_KEY_ENV
+
+  # Example alias for one of the free models you listed
+  - model_name: xkiro-deepseek-free
+    litellm_params:
+      # Note: Check xKiro's API docs for the exact string ID for their free models
+      model: "openai/DeepSeek-V4.1-Flash" 
+      api_base: "https://api.xkiro.com/v1"
+      api_key: os.environ/XKIRO_API_KEY_ENV  
+
+  # ==========================================
+  # xKiro Wildcard (Call any model dynamically)
+  # ==========================================
+  - model_name: "xkiro/*"
+    litellm_params:
+      model: "openai/*"
+      api_base: "https://api.xkiro.com/v1"
+      api_key: os.environ/XKIRO_API_KEY_ENV  
+
+  # ==========================================================
+  # 2. VYCEAI, multiple accounts
+  #    Same model_name = pooled (load-balanced + failover)
+  #    Different model_name = one specific account
+  # ==========================================================
+  # Pooled "deepseek-flash": account 1 active, accounts 2 and 3 waiting for keys
+  - { model_name: deepseek-flash, litellm_params: { model: "openai/deepseek-v4-flash", api_base: "https://vyceai.com/v1", api_key: "os.environ/VYCEAI_API_KEY" } }
+  # - { model_name: deepseek-flash, litellm_params: { model: "openai/deepseek-v4-flash", api_base: "https://vyceai.com/v1", api_key: "os.environ/VYCEAI_KEY_2" } }
+  # - { model_name: deepseek-flash, litellm_params: { model: "openai/deepseek-v4-flash", api_base: "https://vyceai.com/v1", api_key: "os.environ/VYCEAI_KEY_3" } }
+
+  # Specific account only
+  - { model_name: deepseek-flash-acc1, litellm_params: { model: "openai/deepseek-v4-flash", api_base: "https://vyceai.com/v1", api_key: "os.environ/VYCEAI_API_KEY" } }
+  # - { model_name: deepseek-flash-acc2, litellm_params: { model: "openai/deepseek-v4-flash", api_base: "https://vyceai.com/v1", api_key: "os.environ/VYCEAI_KEY_2" } }
+  # - { model_name: deepseek-flash-acc3, litellm_params: { model: "openai/deepseek-v4-flash", api_base: "https://vyceai.com/v1", api_key: "os.environ/VYCEAI_KEY_3" } }
+
+  # Any VyceAI model from a chosen account (use vyce1/<model-id>, vyce2/<model-id>)
+  - { model_name: "vyce1/*", litellm_params: { model: "openai/*", api_base: "https://vyceai.com/v1", api_key: "os.environ/VYCEAI_API_KEY" } }
+  # - { model_name: "vyce2/*", litellm_params: { model: "openai/*", api_base: "https://vyceai.com/v1", api_key: "os.environ/VYCEAI_KEY_2" } }
+  # - { model_name: "vyce3/*", litellm_params: { model: "openai/*", api_base: "https://vyceai.com/v1", api_key: "os.environ/VYCEAI_KEY_3" } }
+
+  # ==========================================================
+  # 3. DIRECT ACCESS WILDCARDS (use as provider/model-id)
+  #    Enable each after adding its key to .env
+  # ==========================================================
+  # - { model_name: "groq/*",       litellm_params: { model: "groq/*",       api_key: "os.environ/GROQ_API_KEY" } }
+  # - { model_name: "gemini/*",     litellm_params: { model: "gemini/*",     api_key: "os.environ/GEMINI_API_KEY" } }
+  # - { model_name: "openrouter/*", litellm_params: { model: "openrouter/*", api_key: "os.environ/OPENROUTER_API_KEY" } }
+  # - { model_name: "mistral/*",    litellm_params: { model: "mistral/*",    api_key: "os.environ/MISTRAL_API_KEY" } }
+
+  # ==========================================================
+  # 4. TASK ALIASES (easy switching in Cline)
+  #    Model IDs change often: verify each in the provider's current model list
+  # ==========================================================
+  # Coding and developing (primary + fallback)
+  # - { model_name: coding,      litellm_params: { model: "mistral/codestral-latest",         api_key: "os.environ/MISTRAL_API_KEY" } }
+  # - { model_name: coding-fast, litellm_params: { model: "groq/llama-3.3-70b-versatile",     api_key: "os.environ/GROQ_API_KEY" } }
+
+  # Planning and large-context analysis
+  # - { model_name: planning,    litellm_params: { model: "gemini/gemini-2.5-flash",          api_key: "os.environ/GEMINI_API_KEY" } }
+
+  # Text content generation (OpenRouter free tier)
+  # - { model_name: text-gen,    litellm_params: { model: "openrouter/meta-llama/llama-3.3-70b-instruct:free", api_key: "os.environ/OPENROUTER_API_KEY" } }
+
+  # Video / multimodal: the old "gemini-2.0-pro-exp-02-05" is likely retired; put a current Gemini model ID here
+  # - { model_name: video-vision, litellm_params: { model: "gemini/<current-gemini-model-id>", api_key: "os.environ/GEMINI_API_KEY" } }
+
+  # Speech-to-text
+  # - { model_name: stt,         litellm_params: { model: "groq/whisper-large-v3",            api_key: "os.environ/GROQ_API_KEY" } }
+
+litellm_settings:
+  drop_params: true   # ignore parameters a provider doesn't support
+
+router_settings:
+  routing_strategy: simple-shuffle   # spreads requests across same-named entries
+  num_retries: 2
+  cooldown_time: 60                  # rests a failing/rate-limited entry for 60s
+  # Enable only after both "coding" and "coding-fast" above are enabled:
+  # fallbacks: [{ "coding": ["coding-fast"] }]
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
